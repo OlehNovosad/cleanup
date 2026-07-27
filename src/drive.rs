@@ -7,6 +7,7 @@ macro_rules! to_gb {
     };
 }
 
+#[allow(dead_code)]
 pub fn print_drives() -> Disks {
     let drives = Disks::new_with_refreshed_list();
     let visible_drive: Vec<_> = drives

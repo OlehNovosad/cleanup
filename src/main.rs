@@ -1,12 +1,21 @@
-use crate::drive::print_drives;
-use std::{io, println};
-
 mod drive;
+mod progress_bar;
+mod scanner;
+
+use crate::drive::print_drives;
+use std::fs;
+use std::io::{self, Write};
 
 fn main() {
+    let mut output = fs::File::create("output.txt").expect("Failed to create file");
+
+    select_drive();
+    run_scan("/Users/olehnovosad/Documents", &mut output);
+}
+
+fn select_drive() {
     let mut drive = String::new();
 
-    // Get list of drives
     let drives = print_drives();
 
     io::stdin()
@@ -24,4 +33,17 @@ fn main() {
         .sum();
 
     println!("{}", total_size);
+}
+
+fn run_scan(path: &str, writer: &mut impl Write) {
+    match scanner::start_scan(path.to_string()) {
+        Ok(scan_res) => {
+            for res in scan_res.iter() {
+                writeln!(writer, "{}", res).expect("Failed to write to file");
+            }
+        }
+        Err(err) => {
+            writeln!(writer, "Error while scanning: {err}").expect("Failed to write to file");
+        }
+    }
 }
